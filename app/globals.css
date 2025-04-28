@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-
+@plugin 'tailwindcss-animate';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -56,6 +56,7 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
+
   *,
   ::after,
   ::before,
@@ -132,6 +133,7 @@
   * {
     @apply border-border;
   }
+
   h1 {
     @apply text-4xl md:text-6xl xl:text-7xl font-bold;
   }
@@ -153,11 +155,13 @@
   }
 
   @keyframes gradient-x {
+
     0%,
     100% {
       background-size: 200% 100%;
       background-position: left center;
     }
+
     50% {
       background-size: 200% 100%;
       background-position: right center;
@@ -172,10 +176,12 @@
 @utility container {
   margin-inline: auto;
   padding-inline: 2rem;
-  @media (width >= --theme(--breakpoint-sm)) {
+
+  @media (width >=--theme(--breakpoint-sm)) {
     max-width: none;
   }
-  @media (width >= 1400px) {
+
+  @media (width >=1400px) {
     max-width: 1400px;
   }
 }
