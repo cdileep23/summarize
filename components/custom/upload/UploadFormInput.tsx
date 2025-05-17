@@ -1,16 +1,27 @@
-"use client"
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input';
-import React from 'react'
-interface UploadFormInputProps{
-    onSubmit:(e:React.FormEvent<HTMLFormElement>)=>void;
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Loader } from "lucide-react";
+import React, { forwardRef } from "react";
+
+interface UploadFormInputProps {
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  isLoading: boolean;
 }
-const UploadFormInput = ({onSubmit}:UploadFormInputProps) => {
+
+export const UploadFormInput = forwardRef<
+  HTMLFormElement,
+  UploadFormInputProps
+>(({ onSubmit, isLoading }, ref) => {
   return (
     <div>
-      {" "}
-      <form className="flex flex-col gap-6 items-center" onSubmit={onSubmit}>
-        <div className='flex justify-end items-center gap-1.5'>
+      <form
+        ref={ref}
+        className="flex flex-col gap-6 items-center"
+        onSubmit={onSubmit}
+      >
+        <div className="flex justify-end items-center gap-1.5">
           <Input
             id="file"
             name="file"
@@ -19,11 +30,22 @@ const UploadFormInput = ({onSubmit}:UploadFormInputProps) => {
             required
             type="file"
           />
-          <Button type='submit'>Upload Your File</Button>
+          <Button disabled={isLoading} type="submit">
+            {isLoading ? (
+              <>
+                <Loader size={16} className="animate-spin mr-2" />
+                Processing
+              </>
+            ) : (
+              "Upload Your File"
+            )}
+          </Button>
         </div>
       </form>
     </div>
   );
-}
+});
 
-export default UploadFormInput
+UploadFormInput.displayName = "UploadFormInput";
+
+export default UploadFormInput;
