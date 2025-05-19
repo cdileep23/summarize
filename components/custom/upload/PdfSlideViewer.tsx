@@ -1,10 +1,18 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Maximize2,
+  Minimize2,
+  FileText,
+} from "lucide-react";
 
 const PDFSlideViewer = ({ slides }: { slides: string[] }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const nextSlide = () => {
     if (currentSlide < slides.length - 1 && !isAnimating) {
@@ -20,6 +28,14 @@ const PDFSlideViewer = ({ slides }: { slides: string[] }) => {
     }
   };
 
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+    // Scroll to top when toggling fullscreen
+    if (contentRef.current) {
+      contentRef.current.scrollTop = 0;
+    }
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsAnimating(false);
@@ -32,11 +48,12 @@ const PDFSlideViewer = ({ slides }: { slides: string[] }) => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") nextSlide();
       if (e.key === "ArrowLeft") prevSlide();
+      if (e.key === "Escape" && isFullscreen) toggleFullscreen();
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [currentSlide, slides.length, isAnimating]);
+  }, [currentSlide, slides.length, isAnimating, isFullscreen]);
 
   if (!slides || slides.length === 0) {
     return null;
@@ -59,8 +76,12 @@ const PDFSlideViewer = ({ slides }: { slides: string[] }) => {
           HeadingTag,
           {
             key: `h-${pIndex}`,
-            className: `font-bold text-gray-800 mb-4 ${
-              level === 1 ? "text-2xl" : level === 2 ? "text-xl" : "text-lg"
+            className: `font-bold mb-4 ${
+              level === 1
+                ? "text-3xl bg-gradient-to-r from-primary to-accent-foreground text-transparent bg-clip-text animate-gradient-x"
+                : level === 2
+                ? "text-2xl text-primary"
+                : "text-xl text-accent-foreground"
             }`,
           },
           headingText
@@ -79,11 +100,17 @@ const PDFSlideViewer = ({ slides }: { slides: string[] }) => {
         return (
           <ul
             key={`ul-${pIndex}`}
-            className="list-disc pl-6 mb-4 space-y-2 text-left"
+            className="list-none pl-6 mb-6 space-y-3 text-left"
           >
             {items.map((item, iIndex) => (
-              <li key={`li-${pIndex}-${iIndex}`} className="text-gray-700">
-                {renderTextWithFormatting(item)}
+              <li
+                key={`li-${pIndex}-${iIndex}`}
+                className="flex items-start group"
+              >
+                <span className="inline-block w-2 h-2 rounded-full bg-primary mt-2 mr-3 group-hover:bg-accent-foreground transition-colors duration-300"></span>
+                <span className="text-foreground group-hover:text-foreground transition-colors duration-300">
+                  {renderTextWithFormatting(item)}
+                </span>
               </li>
             ))}
           </ul>
@@ -92,7 +119,10 @@ const PDFSlideViewer = ({ slides }: { slides: string[] }) => {
 
       // Handle regular paragraphs
       return (
-        <div key={`p-${pIndex}`} className="mb-4 text-gray-700 text-left">
+        <div
+          key={`p-${pIndex}`}
+          className="mb-5 text-foreground text-left leading-relaxed hover:text-foreground transition-colors duration-300"
+        >
           {renderTextWithFormatting(paragraph)}
         </div>
       );
@@ -105,7 +135,10 @@ const PDFSlideViewer = ({ slides }: { slides: string[] }) => {
     return parts.map((part, index) => {
       if (part.startsWith("**") && part.endsWith("**")) {
         return (
-          <span key={`bold-${index}`} className="font-bold text-rose-600">
+          <span
+            key={`bold-${index}`}
+            className="font-bold relative text-primary after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-secondary after:origin-bottom-right after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out"
+          >
             {part.slice(2, -2)}
           </span>
         );
@@ -117,43 +150,68 @@ const PDFSlideViewer = ({ slides }: { slides: string[] }) => {
   };
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-lg overflow-hidden">
-      {/* Slide header with controls */}
-      <div className="bg-gray-100 px-6 py-3 flex justify-between items-center border-b">
-        <h3 className="font-semibold text-gray-700">PDF Summary</h3>
-        <div className="flex space-x-2">
+    <div
+      className={`w-full bg-card text-card-foreground rounded-lg shadow-lg overflow-hidden border border-border transition-all duration-500 ${
+        isFullscreen ? "fixed inset-0 z-50 rounded-none" : ""
+      }`}
+    >
+      {/* Header with animated background */}
+      <div className="bg-gradient-to-r from-secondary to-secondary/50 backdrop-blur-sm px-6 py-4 flex justify-between items-center border-b border-border animate-gradient-x">
+        <div className="flex items-center space-x-2">
+          <FileText className="text-primary" size={20} />
+          <h3 className="font-bold text-primary text-lg">PDF Summary</h3>
+        </div>
+        <div className="flex space-x-3 items-center">
           <button
             onClick={prevSlide}
             disabled={currentSlide === 0 || isAnimating}
-            className={`p-2 rounded-full transition-colors ${
+            className={`p-2 rounded-full transition-all duration-300 ${
               currentSlide === 0
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                : "bg-primary text-white hover:bg-rose-700"
+                ? "bg-muted text-muted-foreground cursor-not-allowed"
+                : "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-md"
             }`}
             aria-label="Previous slide"
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft size={18} />
           </button>
+
+          <div className="text-xs font-medium text-foreground bg-background px-3 py-1 rounded-full shadow-sm">
+            {currentSlide + 1} / {slides.length}
+          </div>
+
           <button
             onClick={nextSlide}
             disabled={currentSlide === slides.length - 1 || isAnimating}
-            className={`p-2 rounded-full transition-colors ${
+            className={`p-2 rounded-full transition-all duration-300 ${
               currentSlide === slides.length - 1
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                : "bg-primary text-white hover:bg-rose-700"
+                ? "bg-muted text-muted-foreground cursor-not-allowed"
+                : "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-md"
             }`}
             aria-label="Next slide"
           >
-            <ChevronRight size={16} />
+            <ChevronRight size={18} />
+          </button>
+
+          <button
+            onClick={toggleFullscreen}
+            className="ml-2 p-2 rounded-full bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-all duration-300"
+            aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+          >
+            {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
           </button>
         </div>
       </div>
 
-      {/* Slide content */}
-      <div className="p-6 min-h-64 md:min-h-96 relative overflow-y-auto">
+      {/* Slide content with theme styling */}
+      <div
+        ref={contentRef}
+        className={`p-8 overflow-y-auto bg-card bg-opacity-90 transition-all duration-500 ${
+          isFullscreen ? "h-full" : "min-h-64 md:min-h-96"
+        }`}
+      >
         <div
-          className={`transition-opacity duration-300 ease-in-out ${
-            isAnimating ? "opacity-90" : "opacity-100"
+          className={`transition-all duration-500 ease-in-out transform ${
+            isAnimating ? "opacity-0 scale-95" : "opacity-100 scale-100"
           }`}
         >
           <div className="prose max-w-none w-full mx-auto">
@@ -162,9 +220,9 @@ const PDFSlideViewer = ({ slides }: { slides: string[] }) => {
         </div>
       </div>
 
-      {/* Pagination - only dots */}
-      <div className="bg-gray-50 px-6 py-3 flex justify-center border-t">
-        <div className="flex space-x-1.5">
+      {/* Animated pagination indicators */}
+      <div className="bg-gradient-to-r from-secondary to-secondary/50 px-6 py-4 flex justify-center border-t border-border animate-gradient-x">
+        <div className="flex space-x-2 items-center">
           {slides.map((_, index) => (
             <button
               key={index}
@@ -174,10 +232,10 @@ const PDFSlideViewer = ({ slides }: { slides: string[] }) => {
                   setCurrentSlide(index);
                 }
               }}
-              className={`w-2 h-2 rounded-full transition-all ${
+              className={`h-2.5 rounded-full transition-all duration-300 ${
                 currentSlide === index
-                  ? "bg-primary w-4"
-                  : "bg-gray-300 hover:bg-gray-400"
+                  ? "bg-gradient-to-r from-primary to-accent-foreground w-8 shadow-md animate-gradient-x"
+                  : "bg-muted hover:bg-muted-foreground w-2.5"
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />

@@ -28,3 +28,26 @@ export async function deleteSummary(summaryId:string){
     }
 
 }
+
+export async function getSummaryAction(id:string){
+    try {
+        const sql=await getDBConnection()
+        const[summary]=await sql `SELECT * FROM pdf_summaries where id=${id}`
+        console.log(summary)
+        return summary
+    } catch (error) {
+        console.error("error fecthing summary by id:", id)
+        return null
+    }
+}
+export interface PdfSummary {
+  id: string;
+  user_id: string;
+  original_file_url: string;
+  summary_text: string;
+  status: "completed" | "processing" | "failed"; // Assuming possible status values
+  title: string;
+  file_name: string;
+  created_at: string | Date;
+  updated_at: string | Date;
+}
