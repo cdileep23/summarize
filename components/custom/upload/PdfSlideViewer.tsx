@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const PDFSlideViewer = ({ slides = [] }) => {
+const PDFSlideViewer = ({ slides }: { slides: string[] }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -29,7 +29,7 @@ const PDFSlideViewer = ({ slides = [] }) => {
   }, [currentSlide]);
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") nextSlide();
       if (e.key === "ArrowLeft") prevSlide();
     };
@@ -42,7 +42,7 @@ const PDFSlideViewer = ({ slides = [] }) => {
     return null;
   }
 
-  const renderSlideContent = (content) => {
+  const renderSlideContent = (content: string) => {
     const paragraphs = content.split(/\n\n+/).filter((p) => p.trim());
 
     return paragraphs.map((paragraph, pIndex) => {
@@ -99,7 +99,7 @@ const PDFSlideViewer = ({ slides = [] }) => {
     });
   };
 
-  const renderTextWithFormatting = (text) => {
+  const renderTextWithFormatting = (text: string) => {
     const parts = text.split(/(\*\*.*?\*\*|:[a-z_]+:)/g);
 
     return parts.map((part, index) => {

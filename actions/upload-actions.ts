@@ -1,10 +1,16 @@
 "use server";
 
+import { getDBConnection } from "@/lib/action";
 import { fetchAndExtract } from "@/lib/langchain";
+import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { revalidatePath } from "next/cache";
+import { Sumana } from "next/font/google";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_AI_KEY || "");
-
+interface pdfSummary{
+userId?:string,fileUrl:string,summary:string,title:string,fileName:string
+}
 export async function generatePDFSummary(
   uploadResponse: [
     {
@@ -46,12 +52,12 @@ export async function generatePDFSummary(
   try {
     // 1. Extract text from PDF
     const text = await fetchAndExtract(pdfUrl);
-    console.log("Extracted text length:", text);
+   
 
    
     const summary = await generateSummaryFromGemini(text);
 
-console.log(summary)
+
     return {
       success: true,
       message: "Summary generated successfully with Gemini",
@@ -107,4 +113,71 @@ export async function generateSummaryFromGemini(text: string): Promise<string> {
       error instanceof Error ? error.message : "Gemini API failed"
     );
   }
+}
+
+export async function savedPdfSummary({
+  userId,
+  fileUrl,
+  summary,
+  title,
+  fileName,
+}: pdfSummary) {
+  try {
+    const sql = await getDBConnection();
+    await sql`INSERT INTO pdf_summaries (user_id, original_file_url, summary_text, title, file_name)
+VALUES (
+   ${userId},
+   ${fileUrl},
+   ${summary},
+   ${title},
+   ${fileName}
+);
+`;
+  } catch (error) {
+    console.log("Error saving PDF Summary", error);
+  }
+}
+export async function storePdfSummaryAction({
+  userId,
+  fileUrl,
+  summary,
+  title,
+  fileName,
+}: pdfSummary) {
+  let saveSummary;
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return {
+        success: false,
+        message: "user Not Found",
+      };
+    }
+    saveSummary = await savedPdfSummary({
+      userId,
+      fileUrl,
+      summary,
+      title,
+      fileName,
+    });
+    if(!saveSummary){
+      return {
+        success:false,
+        message:"Failed to save PDF summary, please try again"
+      }
+    }
+   
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Error Saving PDF Summary",
+    };
+  }
+
+  revalidatePath('/dashboard')
+   return {
+     success: true,
+     message: "Saved Successfully",
+   };
 }

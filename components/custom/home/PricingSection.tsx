@@ -53,7 +53,7 @@ const PlanCard = ({
   const isPro = id === "pro";
 
   return (
-    <div
+    <div id="pricing"
       className={`w-full max-w-sm rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-105 ${
         isPro ? "border-2 border-rose-500" : "border border-gray-200"
       }`}

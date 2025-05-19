@@ -43,7 +43,7 @@ const Header = () => {
       </div>
       <div className="flex lg:justify-center gap-4 lg:gap-12 lg:items-center ">
         <Link
-          href="#pricing"
+          href="/#pricing"
           className={`transition-colors text-sm duration-200 ${
             isActive("#pricing")
               ? "text-rose-500"

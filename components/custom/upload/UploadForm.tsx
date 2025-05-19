@@ -5,7 +5,7 @@ import UploadFormInput from "./UploadFormInput";
 import PDFSlideViewer from "./PdfSlideViewer";
 import { useUploadThing } from "@/utils/uploadthing";
 import { toast } from "sonner";
-import { generatePDFSummary } from "@/actions/upload-actions";
+import { generatePDFSummary, storePdfSummaryAction } from "@/actions/upload-actions";
 
 const schema = z.object({
   file: z
@@ -19,9 +19,11 @@ const schema = z.object({
 });
 
 const UploadForm = () => {
-  const formRef = useRef(null);
+const formRef = useRef<HTMLFormElement>(null);
+
   const [isLoading, setLoading] = useState(false);
-  const [summarySlides, setSummarySlides] = useState<String[]>([]);
+  const [summarySlides, setSummarySlides] = useState<string[]>([]);
+  
 
   const { startUpload } = useUploadThing("pdfUploader", {
     onClientUploadComplete: () => {
@@ -44,7 +46,7 @@ const UploadForm = () => {
     },
   });
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       setLoading(true);
@@ -111,10 +113,20 @@ const UploadForm = () => {
           .split("##")
           .map((slide) => slide.trim())
           .filter(Boolean);
-        setSummarySlides(slides);
+        let rawTitle = slides[0];
+        let title = rawTitle.replace(/^\s*#+\s*/, "");
 
-        toast.success("PDF processed successfully!", {
-          description: "Your summary is ready to view",
+        setSummarySlides(slides);
+        await storePdfSummaryAction({
+          summary: data.summary,
+          fileUrl: res[0].serverData.file.url,
+          title,
+          fileName: data.fileName,
+        });
+     
+
+        toast.success("PDF processed & Stored successfully ✅", {
+          description: "Your summary is ready",
           duration: 3000,
         });
         formRef.current?.reset();
