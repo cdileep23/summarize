@@ -90,9 +90,9 @@ console.log(summary)
           </Link>
         </div>
 
-        {/* Summary Container */}
+    
         <div>
-          {/* Action Bar */}
+        
           <div className="bg-gray-50 px-6 py-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="text-sm text-gray-600">
               <span className="font-medium">Source:</span> {summary.file_name}
@@ -103,7 +103,7 @@ console.log(summary)
             </div>
           </div>
 
-          {/* Summary Content */}
+         
           <div className="p-6 md:p-8">
             <div className="prose prose-blue max-w-none mb-8">
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">
@@ -112,7 +112,7 @@ console.log(summary)
               <p className="text-gray-700 leading-relaxed">{description}</p>
             </div>
 
-            {/* Slides Viewer */}
+       
             <div className="border-t pt-6">
               <PDFSlideViewer slides={slides} />
             </div>

@@ -11,8 +11,8 @@ export interface PdfSummary {
   status: string;
   title: string;
   file_name: string;
-  created_at: string; // or Date
-  updated_at: string; // or Date
+  created_at: string; 
+  updated_at: string;
 }
 
 export const DownloadSummaryButton = ({ summary }: { summary: PdfSummary }) => {
@@ -30,7 +30,7 @@ export const DownloadSummaryButton = ({ summary }: { summary: PdfSummary }) => {
     document.body.appendChild(a);
     a.click();
 
-    // Clean up
+    
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };

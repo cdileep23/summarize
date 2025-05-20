@@ -43,33 +43,18 @@ const Page = async () => {
           </Link>
         </div>
 
-        {/* Upgrade Notice - Only show if they have summaries and reached limit */}
-        {summaries.length > 0 && summaries.length >= limit && (
-          <div className="bg-rose-50 border border-rose-200 rounded-lg p-2 text-rose-800">
-            <p className="flex flex-wrap items-center gap-1">
-              You have reached the limit of {limit} uploads on the basic plan.{" "}
-              <Link
-                href="/#pricing"
-                className="inline-flex items-center text-rose-600 hover:text-rose-800 font-semibold"
-              >
-                Click here to Upgrade to Pro
-                <ArrowRight className="ml-1 w-4 h-4" />
-              </Link>{" "}
-              for unlimited uploads.
-            </p>
-          </div>
-        )}
+    
 
-        {/* Content Area */}
+      
         {summaries.length > 0 ? (
-          /* Dashboard Cards - When summaries exist */
+          
           <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 sm:px-0">
             {summaries.map((summary) => (
               <DashboardCard key={summary.id} summary={summary} />
             ))}
           </div>
         ) : (
-          /* Empty State - When no summaries */
+        
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="max-w-md space-y-4">
               <FileText className="w-20 h-20 mx-auto text-gray-200" />

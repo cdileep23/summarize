@@ -33,7 +33,7 @@ const steps: Steps[] = [
 const HowItWorks = () => {
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-rose-50/20 to-white py-12 lg:py-24">
-      {/* Decorative elements */}
+    
       <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-rose-200/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70" />
       <div className="absolute -top-20 -right-20 w-64 h-64 bg-purple-200/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70" />
 
@@ -69,7 +69,7 @@ function StepCard({
 }: Steps & { stepNumber?: number }) {
   return (
     <div className="relative group">
-      {/* Step number decoration */}
+     
       {stepNumber && (
         <div className="absolute -top-4 -left-4 w-8 h-8 flex items-center justify-center rounded-full bg-rose-600 text-white font-bold text-sm z-10">
           {stepNumber}
@@ -77,10 +77,10 @@ function StepCard({
       )}
 
       <div className="relative h-full p-6 sm:p-8 rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 group-hover:border-rose-300 overflow-hidden">
-        {/* Hover effect overlay */}
+       
         <div className="absolute inset-0 bg-gradient-to-br from-rose-50/10 to-white/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-        {/* Icon container */}
+      
         <div className="w-14 h-14 sm:w-16 sm:h-16 mb-6 flex items-center justify-center rounded-lg bg-rose-50 text-rose-600 group-hover:bg-rose-100 transition-colors duration-300">
           {icon}
         </div>
@@ -88,7 +88,7 @@ function StepCard({
         <h3 className="text-xl font-semibold text-gray-900 mb-3">{label}</h3>
         <p className="text-gray-600">{description}</p>
 
-        {/* Animated arrow on hover */}
+        
         <div className="absolute right-6 bottom-6 text-rose-600 opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300">
           <svg
             xmlns="http://www.w3.org/2000/svg"
