@@ -13,9 +13,9 @@ interface summaryCard {
   updated_at: Date;
   id: string;
   user_id: string;
-  original_file_url:string
+  original_file_url:string;
 }
-const DashboardCard = ({ summary }) => {
+const DashboardCard = ({ summary }:{summary:any}) => {
   const formattedDate = summary.created_at
     ? formatDistanceToNow(new Date(summary.created_at), { addSuffix: true })
     : "Unknown date";

@@ -83,7 +83,7 @@ const formRef = useRef<HTMLFormElement>(null);
         duration: 2000,
       });
 
-      const res = await startUpload([file]);
+      const res:any = await startUpload([file]);
 
       if (!res || !res[0]?.url) {
         toast.error("Upload failed", {

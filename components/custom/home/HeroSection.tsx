@@ -46,7 +46,7 @@ export const HeroSection = () => {
             asChild
             className="px-8 py-6 text-lg bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 shadow-lg hover:shadow-rose-200/50 transition-all"
           >
-            <Link href="/#pricing">Try Summarize Now</Link>
+            <Link href="/upload">Try Summarize Now</Link>
           </Button>
          
         </div>

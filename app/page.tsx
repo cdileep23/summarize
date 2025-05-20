@@ -9,7 +9,7 @@ export default function Home() {
     <div className="relative w-full ">
      <HeroSection/>
   <HowItWorks/>
-  <PricingSection/>
+
     </div>
   );
 }

@@ -5,12 +5,17 @@ import { fetchAndExtract } from "@/lib/langchain";
 import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { revalidatePath } from "next/cache";
-import { Sumana } from "next/font/google";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_AI_KEY || "");
-interface pdfSummary{
-userId?:string,fileUrl:string,summary:string,title:string,fileName:string
+
+interface pdfSummary {
+  userId?: string;
+  fileUrl: string;
+  summary: string;
+  title: string;
+  fileName: string;
 }
+
 export async function generatePDFSummary(
   uploadResponse: [
     {
@@ -29,7 +34,6 @@ export async function generatePDFSummary(
       success: false,
       message: "File Upload failed",
       data: null,
-   
     };
   }
 
@@ -45,18 +49,12 @@ export async function generatePDFSummary(
       success: false,
       message: "File URL missing",
       data: null,
-      
     };
   }
 
   try {
-    // 1. Extract text from PDF
     const text = await fetchAndExtract(pdfUrl);
-   
-
-   
     const summary = await generateSummaryFromGemini(text);
-
 
     return {
       success: true,
@@ -81,7 +79,7 @@ export async function generatePDFSummary(
 export async function generateSummaryFromGemini(text: string): Promise<string> {
   try {
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash", 
+      model: "gemini-1.5-flash",
       generationConfig: {
         temperature: 0.5,
         topP: 0.9,
@@ -96,7 +94,7 @@ export async function generateSummaryFromGemini(text: string): Promise<string> {
     - Bolded important terms
     
     Document content:
-    ${text.substring(0, 1000000)}`; // Gemini 1.5 supports long context
+    ${text.substring(0, 1000000)}`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -121,22 +119,19 @@ export async function savedPdfSummary({
   summary,
   title,
   fileName,
-}: pdfSummary) {
+}: pdfSummary): Promise<boolean> {
   try {
     const sql = await getDBConnection();
     await sql`INSERT INTO pdf_summaries (user_id, original_file_url, summary_text, title, file_name)
-VALUES (
-   ${userId},
-   ${fileUrl},
-   ${summary},
-   ${title},
-   ${fileName}
-);
-`;
+      VALUES (${userId}, ${fileUrl}, ${summary}, ${title}, ${fileName});
+    `;
+    return true;
   } catch (error) {
     console.log("Error saving PDF Summary", error);
+    return false;
   }
 }
+
 export async function storePdfSummaryAction({
   userId,
   fileUrl,
@@ -144,40 +139,41 @@ export async function storePdfSummaryAction({
   title,
   fileName,
 }: pdfSummary) {
-  let saveSummary;
   try {
-    const { userId } = await auth();
-    if (!userId) {
+    const authData = await auth();
+    const currentUserId = authData?.userId;
+    if (!currentUserId) {
       return {
         success: false,
-        message: "user Not Found",
+        message: "User not found",
       };
     }
-    saveSummary = await savedPdfSummary({
-      userId,
+
+    const saveSummary = await savedPdfSummary({
+      userId: currentUserId,
       fileUrl,
       summary,
       title,
       fileName,
     });
-    if(!saveSummary){
+
+    if (!saveSummary) {
       return {
-        success:false,
-        message:"Failed to save PDF summary, please try again"
-      }
+        success: false,
+        message: "Failed to save PDF summary, please try again",
+      };
     }
-   
+
+    revalidatePath("/dashboard");
+    return {
+      success: true,
+      message: "Saved successfully",
+    };
   } catch (error) {
     return {
       success: false,
       message:
-        error instanceof Error ? error.message : "Error Saving PDF Summary",
+        error instanceof Error ? error.message : "Error saving PDF summary",
     };
   }
-
-  revalidatePath('/dashboard')
-   return {
-     success: true,
-     message: "Saved Successfully",
-   };
 }

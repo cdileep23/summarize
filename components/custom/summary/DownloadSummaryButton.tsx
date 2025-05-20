@@ -1,19 +1,27 @@
-// components/custom/summary/DownloadSummaryButton.tsx
+
 "use client";
 
-import { PdfSummary } from "@/actions/summary-action";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
+export interface PdfSummary {
+  id: string;
+  user_id: string;
+  original_file_url: string;
+  summary_text: string;
+  status: string;
+  title: string;
+  file_name: string;
+  created_at: string; // or Date
+  updated_at: string; // or Date
+}
 
-export const DownloadSummaryButton = ({
-  summary,
-}:{summary:PdfSummary}) => {
+export const DownloadSummaryButton = ({ summary }: { summary: PdfSummary }) => {
   const handleDownloadSummary = () => {
-    // Create a blob with the summary text
+
     const blob = new Blob([summary.summary_text], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
 
-    // Create a temporary anchor element to trigger the download
+    
     const a = document.createElement("a");
     a.href = url;
     a.download =
@@ -28,8 +36,12 @@ export const DownloadSummaryButton = ({
   };
 
   return (
-    <Button variant="outline" onClick={handleDownloadSummary}>
-      <Download className="gap-2 hover:bg-gray-100 transition-colors" />
+    <Button
+      variant="outline"
+      onClick={handleDownloadSummary}
+      className="gap-2 hover:bg-gray-100 transition-colors"
+    >
+      <Download className="h-4 w-4" />
       Download Summary
     </Button>
   );

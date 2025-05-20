@@ -48,6 +48,6 @@ export interface PdfSummary {
   status: "completed" | "processing" | "failed"; // Assuming possible status values
   title: string;
   file_name: string;
-  created_at: string | Date;
-  updated_at: string | Date;
+  created_at: Date;
+  updated_at:  Date;
 }

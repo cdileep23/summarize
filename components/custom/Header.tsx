@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
 const Header = () => {
-  const isLoggedIn = false;
+ 
   const pathname = usePathname();
 
   // Helper function to determine if a link is active
@@ -42,16 +42,7 @@ const Header = () => {
         </Link>
       </div>
       <div className="flex lg:justify-center gap-4 lg:gap-12 lg:items-center ">
-        <Link
-          href="/#pricing"
-          className={`transition-colors text-sm duration-200 ${
-            isActive("#pricing")
-              ? "text-rose-500"
-              : "text-gray-600 hover:text-rose-500"
-          }`}
-        >
-          Pricing
-        </Link>
+       
         <SignedIn>
  <Link
             href="/dashboard"
