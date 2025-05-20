@@ -20,9 +20,11 @@ export const ourFileRouter = {
     
 
       // ✅ Return only JSON-serializable data
+      console.log("file details",file)
       return {
         userId: metadata.userId,
-      file:file
+      fileUrl:file.ufsUrl,
+      fileName:file.name
       };
     }),
 } satisfies FileRouter;

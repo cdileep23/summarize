@@ -38,7 +38,8 @@ const formRef = useRef<HTMLFormElement>(null);
         duration: 3000,
       });
     },
-    onUploadBegin: () => {
+    onUploadBegin: (data) => {
+      console.log("upload has begin for ", data)
       toast.message("Uploading your PDF...", {
         description: "Please wait while we upload your file",
         duration: 2000,
@@ -83,9 +84,9 @@ const formRef = useRef<HTMLFormElement>(null);
         duration: 2000,
       });
 
-      const res:any = await startUpload([file]);
-
-      if (!res || !res[0]?.url) {
+      const uploadResponse:any = await startUpload([file]);
+console.log("Upload response", uploadResponse)
+      if (!uploadResponse || !uploadResponse[0]?.url) {
         toast.error("Upload failed", {
           description: "Couldn't complete the upload. Please try again.",
           duration: 3000,
@@ -100,9 +101,13 @@ const formRef = useRef<HTMLFormElement>(null);
         description: "Generating summary from your document...",
         duration: Infinity, // Will manually dismiss
       });
+      const uploadFileUrl = uploadResponse[0].serverData.fileUrl;
 
       // Extract PDF text and summarize
-      const result = await generatePDFSummary(res);
+      const result = await generatePDFSummary({
+        fileUrl: uploadFileUrl,
+        fileName: file.name,
+      });
       const { data = null, message = null } = result || {};
 
       toast.dismiss(processingToast);
@@ -119,7 +124,7 @@ const formRef = useRef<HTMLFormElement>(null);
         setSummarySlides(slides);
         await storePdfSummaryAction({
           summary: data.summary,
-          fileUrl: res[0].serverData.file.url,
+          fileUrl: uploadFileUrl,
           title,
           fileName: data.fileName,
         });
